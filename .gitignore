@@ -1,0 +1,274 @@
+#include <iostream>
+using namespace std;
+//Function to place the ships in thier intial places.
+//The functions taks the board array and the ship size as arrguments
+int AssignShip(int array[10][10], int size){
+	// random selection of ship allignmnet either Horizontal or vertical
+	int Alignment = rand() % 2;
+	// max first point place for a ship to be placed in order to fit in all of it inside the board
+	int max = 11 - size;
+	//intializing needed variables
+	// horizontal location
+	int Hpoint;
+	// vertical location
+	int Vpoint;
+	// temp value to be used during the program
+	int temp;
+	//if the ship is Horizontal then do the following
+	if (Alignment == 0) {
+		// Vpoint is any number from 0 to 9
+		Vpoint = rand() % 10;
+		// Hpoint is any number from 0 to max-1
+		Hpoint = rand() % max;
+		// saving Hpoint into temp
+		temp = Hpoint;
+		// checking if any spot desired is taken?
+		for (int i = size; i > 0; i--){
+			// if any spot desired is taken, then program try to find another position for the ship
+			if (array[Vpoint][temp] == 1){
+				return AssignShip(array, size);
+			}
+			temp++;
+		}
+		//but if all the desired spots are avilable then the function start placing the ship
+		while (size > 0){
+			// the ship convert every point where the ship is placed from 0 to 1
+			array[Vpoint][Hpoint] = 1;
+			// increment Hpoint to move to the next point
+			Hpoint++;
+			size--;
+		}
+	}
+	// HERE THE PROGRAM IS DOING THE SAME THING AS ABOVE, BUT INSTEAD FOR HORIZONTAL SHIP FOR A VERTICAL SHIP
+	if (Alignment == 1) {
+		// Hpoint is any number from 0 to 9
+		Hpoint = rand() % 10;
+		// Vpoint is any number from 0 to max-1
+		Vpoint = rand() % max;
+		// saving Vpoint into temp
+		temp = Vpoint;
+		// checking if any spot desired is taken?
+		for (int i = size; i > 0; i--){
+			// if any spot desired is taken, then program try to find another position for the ship
+			if (array[temp][Hpoint] == 1){
+				return AssignShip(array, size);
+			}
+			temp++;
+		}
+		//but if all the desired spots are avilable then the function start placing the ship
+		while (size > 0){
+			// the ship convert every point where the ship is placed from 0 to 1
+			array[Vpoint][Hpoint] = 1;
+			// increment Vpoint to move to the next point
+			Vpoint++;
+			size--;
+		}
+	}
+	//Function return the updated array that is acting as 10 X 10 board
+	return array[10][10];
+}
+// Function to for the user to make a move
+int UserMove(int array[10][10], int y, int x){
+	//if The user pick a correct spot then
+	if (array[y][x] == 1)
+	{
+		// the program display Hit 
+		cout << "Hit!\n" << endl;
+		// and change the value of the spot to zero
+		array[y][x] = 0;
+	}
+	else{
+		// otherwise the program display Miss
+		cout << "Miss!\n";
+	}
+	// The function return the updated board that is acting as 10 X 10 board
+	return array[10][10];
+}
+// this function is made to check if the player has won allready
+bool CheckIfWon(int array[10][10])
+{
+	// conuter that count the number of 1s in the board
+	int total = 0;
+	// current situation of wining
+	bool won = false;
+
+	for (int i = 0; i <= 9; i++)
+	{
+		for (int n = 0; n <= 9; n++)
+		{
+			//if value of a spot is 1
+			if (array[i][n] == 1)
+			{
+				// then increment the value of total
+				total = total + 1;
+			}
+		}
+	}
+	// if the function could find any 1s then the player won
+	if (total == 0)
+	{
+		won = true;
+	}
+	// The function return the sitiuation of wining for the player
+	return won;
+}
+// This function display a board of the history of the hits made by the player
+char HitsArrayFunction(int array[10][10], char HitsArray[10][10], int y, int x){
+	//checking that the spot havent been hit before
+	if (HitsArray[y][x] == '-'){
+		// if the hit succeeded
+		if (array[y][x] == 1)
+		{
+			// then assign the char #
+			HitsArray[y][x] = '#';
+		}
+		else{
+			// but if the hit failed then assign the char *
+			HitsArray[y][x] = '*';
+		}
+	}
+	// The function return the updated history board that is acting as 10 X 10 board
+	return HitsArray[10][10];
+}
+// Main Function that runs the program
+int main()
+{
+	// situation of winning
+	bool won;
+	// board to be played on
+	int array[10][10];
+	// solution array
+	int solution[10][10];
+	// location pointers
+	int x, y;
+	// Hits history array
+	char HitsArray[10][10];
+	// number of turns needed to win
+	int WiningCounter = 0;
+	//intro
+	cout << "Hello!\nAnd remember once you are done playing input any negative number!\n";
+	cout << "Instructions:\n'#' means hit, '*' means miss, and '-' never been hit.\nHave Fun!\n";
+	//formation of array and HistArray
+	for (int i = 0; i < 10; i++){
+		for (int j = 0; j < 10; j++){
+			//array full of zeros which means it has no ships yet
+			array[i][j] = 0;
+			//array full of -  which means it have never been hit
+			HitsArray[i][j] = '-';
+		}
+	}
+	//placing a ship of size 5
+	array[10][10] = AssignShip(array, 5);
+	//placing a ship of size 4
+	array[10][10] = AssignShip(array, 4);
+	//placing a ship of size 3
+	array[10][10] = AssignShip(array, 3);
+	//placing a ship of size 2
+	array[10][10] = AssignShip(array, 2);
+	//coying the intial array to the solution array in case it is need later on in case of the player decide to quit
+	for (int i = 0; i < 10; i++){
+		for (int j = 0; j < 10; j++){
+			solution[i][j] = array[i][j];
+		}
+	}
+	// DELETE THIS BEFORE PRESENTATION
+	for (int i = 0; i < 10; i++){
+		for (int j = 0; j < 10; j++){
+			cout << array[i][j];
+		}
+		cout << endl;
+	}
+
+	while (true){
+		//Asking the player to input x coordinate
+		cout << "Please enter the x coordinate: \n";
+		cin >> x;
+		//if the player input negative number which means the player doesnt want to play anymore
+		if (x < 0){
+			//then display the solution array 
+			cout << "The solution is:\n";
+			for (int i = 0; i < 10; i++){
+				for (int j = 0; j < 10; j++){
+					cout << solution[i][j];
+				}
+				cout << endl;
+			}
+			// thanking the player for playing
+			cout << "Thanks for playing!\n    Good bye!\n";
+			// Return 0 to end the program
+			return 0;
+		}
+		while (x > 9)
+		{
+			// if the player input a value more than  9
+			// then display an error message 
+			cout << "Out of range! Try again.\n";
+			// and ask the player to input a valid entry
+			cout << "Please enter the x coordinate: \n";
+			cin.clear();
+			cin.ignore(255, '\n');
+			cin >> x;
+		}
+		//Asking the player to input y coordinate
+		cout << "Please enter the y coordinate: \n";
+		cin >> y;
+		//if the player input negative number which means the player doesnt want to play anymore
+		if (y < 0){
+			cout << "The solution is:\n";
+			//then display the solution array 
+			for (int i = 0; i < 10; i++){
+				for (int j = 0; j < 10; j++){
+					cout << solution[i][j];
+				}
+				cout << endl;
+			}
+			// thanking the player for playing
+			cout << "Thanks for playing!\n    Good bye!\n";
+			// Return 0 to end the program
+			return 0;
+		}
+		while (y > 9)
+		{
+			// if the player input a value more than  9
+			// then display an error message 
+			cout << "Out of range! Try again.\n";
+			// and ask the player to input a valid entry
+			cout << "Please enter the y coordinate: \n";
+			cin.clear();
+			cin.ignore(255, '\n');
+			cin >> y;
+		}
+		//updating hits array due to the players move
+		HitsArray[10][10] = HitsArrayFunction(array, HitsArray, y, x);
+		//updating the playing array due to the players move
+		array[10][10] = UserMove(array, y, x);
+		//incryment WiningCounter which is acting as score
+		WiningCounter++;
+		//displaying the Hits History array
+		for (int i = 0; i < 10; i++){
+			for (int j = 0; j < 10; j++){
+				cout << HitsArray[i][j];
+			}
+			cout << endl;
+		}
+		//updating the situation of winning
+		won = CheckIfWon(array);
+		//when the player win
+		if (won){
+			//display this message
+			cout << "Congrats, You won!\nIt took you " << WiningCounter << " tries in order to win\n";
+			// and print the soltuion
+			for (int i = 0; i < 10; i++){
+				for (int j = 0; j < 10; j++){
+					cout << solution[i][j];
+				}
+				cout << endl;
+			}
+			//end the program
+			return 0;
+		}
+
+　
+	}
+	return 0;
+}
